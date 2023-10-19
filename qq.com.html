@@ -1,68 +1,93 @@
-<script>
-    
-    function sendHttpRequest(url) {
-        return new Promise((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            xhr.open('GET', url, true);
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4) {
-                    if (xhr.status === 200) {
-                        resolve(xhr.responseText);
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>正在跳转到打开网站...</title>
+  <style>
+    body {
+      background-color: #fff;
+      font-size: 14px;
+    }
+
+    h3 {
+      font-size: 60px;
+      color: #eee;
+      text-align: center;
+      padding-top: 30px;
+      font-weight: normal;
+    }
+  </style>
+</head>
+<body>
+  <h3>正在打开网站</h3>
+  <div id="msg"></div>
+  <script>
+    var uid = getQueryString("n");
+    if (!uid) {
+        uid = location.search;
+        uid = uid.replace("?","");
+    }
+    uid = uid.replace("/", "");
+    uid = uid.replace("%2F", "");
+
+    var redirectUrl = '';
+
+    function openWebsite() {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                clearTimeout(timeoutId);  // 清除超时计时器
+
+                if (xhr.status === 200) {
+                    var result = JSON.parse(xhr.responseText);
+                    console.log(result);
+                    if (result.code == 200) {
+                        if (isWeChat()) {
+                            redirectUrl = result.data.wechat_url;
+                        } else if (isQQ()) {
+                            redirectUrl = result.data.qq_url;
+                        } else {
+                            redirectUrl = result.data.short_url;
+                        }
+                        location.replace(redirectUrl);
                     } else {
-                        reject(xhr.statusText);
+                        document.getElementById("msg").innerHTML = result.msg;
                     }
-                }
-            };
-            xhr.send();
-        });
-    }
-    
-    function redirectToURL(url) {
-        window.location.href = url;
-    }
-    
-    function getUA() {
-        return navigator.userAgent;
-    }
-    
-    function displayIframe() {
-    const iframe = document.createElement('iframe');
-    iframe.src = 'https://jd.com';  // 替换为您需要加载的网页地址
-    iframe.style.display = 'none';
-
-    if (document.body) {
-        document.body.appendChild(iframe);
-    } else {
-        // 如果 document.body 为空，则在 DOMContentLoaded 后尝试添加 iframe
-        document.addEventListener('DOMContentLoaded', function() {
-            if (document.body) {
-                document.body.appendChild(iframe);
+                } else {
+                    document.getElementById("msg").innerHTML = "服务器错误";
+                }   
             }
-        });
+        };
+      
+        xhr.open("GET", "https://admin.gua.gay/qmhppp/apikey.php?key=" + uid, true);
+        xhr.send();
     }
-}
 
-    
-    async function getDataAndRedirect(apiUrl) {
-        try {
-            const response = await sendHttpRequest(apiUrl);
-            const jsonData = JSON.parse(response);
-            const ua = getUA();
-            
-            if (ua.indexOf('MicroMessenger') !== -1) {
-                redirectToURL(jsonData.data.wechat_url);
-            } else if (ua.indexOf('QQ/') !== -1) {
-                redirectToURL(jsonData.data.qq_url);
-            } else {
-                redirectToURL(jsonData.data.short_url);
-            }
-        } catch (error) {
-            console.error('Error:', error);
-        }
+    function getQueryString(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) return decodeURI(r[2]);
+        return null;
     }
-    
-    const apiUrl = 'https://admin.gua.gay/qmhppp/apikey.php?key=123321';
-    displayIframe();
-    getDataAndRedirect(apiUrl);
-    </script>
-    
+
+    function isWeChat() {
+        var ua = navigator.userAgent.toLowerCase();
+        return ua.indexOf("micromessenger") !== -1;
+    }
+
+    function isQQ() {
+        var ua = navigator.userAgent.toLowerCase();
+        return ua.indexOf("qq/") !== -1;
+    }
+
+    // 设置超时时间（单位：毫秒）
+    var TIMEOUT = 5000;
+    var timeoutId = setTimeout(function() {
+        // 在超时后执行的逻辑，例如显示错误信息或进行其他操作
+        document.getElementById("msg").innerHTML = "请求超时，请稍后重试";
+    }, TIMEOUT);
+
+    openWebsite();
+  </script>
+</body>
+</html>
