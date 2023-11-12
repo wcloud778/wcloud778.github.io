@@ -1,0 +1,50 @@
+<script>var siteurl = "https://fh.suo.gay/";</script>
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>loading</title>
+</head>
+<body>
+    <div style="text-align: center;" id="msg"></div>
+    <script>
+
+        var uid = getQueryString("n");
+        if (!uid) {
+            var uid = location.search;
+            uid = uid.replace("?","");
+        }
+        uid = uid.replace("/", "");
+        uid = uid.replace("%2F", "");
+
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+            console.log(xhr);
+            if (xhr.readyState === 4) {
+                if(xhr.status === 200){
+                    var result = JSON.parse(xhr.responseText);
+                    console.log(result);
+                    if (result.code == 200) {
+                        location.replace(result.url);
+                    } else {
+                        document.getElementById("msg").innerHTML = result.msg;
+                    }
+                } else {
+                    document.getElementById("msg").innerHTML = "服务器错误";
+                }   
+            }
+        };
+        xhr.open("GET", siteurl + "api/index/get/key/" + uid, true);
+        xhr.send();
+
+        function getQueryString(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return decodeURI(r[2]);
+            return null;
+        }
+
+    </script>
+</body>
+
+</html>
